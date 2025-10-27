@@ -4,4 +4,4 @@ ruff
 build
 twine
 awscli
-boto3
+boto3   

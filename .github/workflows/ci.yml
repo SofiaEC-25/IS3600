@@ -46,8 +46,8 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         if: matrix.python-version == '3.13' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/CodeBuildServiceRole  # Replace with your CodeBuild role ARN
-          aws-region: us-east-2  # Hardcoded for consistency; use ${{ secrets.AWS_DEFAULT_REGION }} if defined
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/CodeBuildServiceRole
+          aws-region: us-east-2
 
       - name: Debug S3 Bucket Secret
         run: echo "S3 Bucket: ${{ secrets.AWS_S3_BUCKET }}"

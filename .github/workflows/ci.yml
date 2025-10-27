@@ -49,6 +49,13 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-2
+    - name: Debug secrets
+      run: |
+        if [ -z "${{ secrets.AWS_S3_BUCKET }}" ]; then
+          echo "AWS_S3_BUCKET is empty!"
+        else
+          echo "AWS_S3_BUCKET is set."
+        fi
 
     - name: Upload wheel to S3
       if: matrix.python-version == '3.13' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))

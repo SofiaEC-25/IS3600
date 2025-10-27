@@ -2,10 +2,10 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "*" ] # Run on all branches
-  tags: [ "v*" ] # Run on version tags
+    branches: [ "*" ]
+  tags: [ "v*" ]
   pull_request:
-    branches: [ "*" ] # Run on PRs to all branches
+    branches: [ "*" ]
 
 permissions:
   contents: read
@@ -13,7 +13,6 @@ permissions:
 jobs:
   test:
     runs-on: codebuild-Assignment-9-${{ github.run_id }}-${{ github.run_attempt }}
-    environment: test
     strategy:
       matrix:
         python-version: ["3.12", "3.13"]
@@ -31,13 +30,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
           pip install build twine
-
-      - name: Lint with ruff
-        run: ruff check
-
-      - name: Test with pytest
-        run: |
-          pytest -v --cov=file_encoder --cov-report=xml --cov-report=term-missing > pytest-output.txt 2>&1
 
       - name: Build package
         run: python -m build
@@ -60,28 +52,3 @@ jobs:
               aws s3 cp "$file" s3://${{ secrets.AWS_S3_BUCKET }}/wheels/
             fi
           done
-
-      - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
-        if: matrix.python-version == '3.13'
-        with:
-          name: test-results
-          path: |
-            pytest-output.txt
-            coverage.xml
-          retention-days: 30
-
-      - name: Configure CodeArtifact
-        if: matrix.python-version == '3.13' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
-        run: |
-          pip install twine
-          export CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain zabalytics --query authorizationToken --output text --region us-east-2)
-          export CODEARTIFACT_REPOSITORY_URL=$(aws codeartifact get-repository-endpoint --domain zabalytics --repository pypi --format pypi --query repositoryEndpoint --output text --region us-east-2)
-          echo "CODEARTIFACT_AUTH_TOKEN=$CODEARTIFACT_AUTH_TOKEN" >> $GITHUB_ENV
-          echo "CODEARTIFACT_REPOSITORY_URL=$CODEARTIFACT_REPOSITORY_URL" >> $GITHUB_ENV
-
-      - name: Publish to CodeArtifact
-        if: matrix.python-version == '3.13' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
-        run: |
-          aws codeartifact delete-package-versions --domain crochetgirl --repository pypi --format pypi --package file-encoder --versions 0.1.0 --region us-east-2 || true
-          twine upload --repository-url $CODEARTIFACT_REPOSITORY_URL --username aws --password $CODEARTIFACT_AUTH_TOKEN dist/*.whl

@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   test:
-    runs-on: self-hosted
+    runs-on: - codebuild-Assignment-9-${{ github.run_id }}-${{ github.run_attempt }}
     environment: test
     strategy:
       matrix:
@@ -52,7 +52,8 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-2
-
+    - name: Debug S3 Bucket Secret
+      run: echo "S3 Bucket: ${{ secrets.AWS_S3_BUCKET }}"
     - name: Upload wheel to S3
       if: matrix.python-version == '3.13' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
       run: |

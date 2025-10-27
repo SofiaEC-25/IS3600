@@ -12,7 +12,8 @@ permissions:
 
 jobs:
   test:
-    runs-on: - codebuild-Assignment-9-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on: 
+    - codebuild-Assignment-9-${{ github.run_id }}-${{ github.run_attempt }}
     environment: test
     strategy:
       matrix:

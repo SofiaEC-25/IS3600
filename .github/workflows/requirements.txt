@@ -1,0 +1,7 @@
+pytest
+pytest-cov
+ruff
+build
+twine
+awscli
+boto3

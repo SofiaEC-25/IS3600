@@ -1,0 +1,5 @@
+#!/bin/bash
+# check if httpd is running and stop it
+if pgrep httpd >/dev/null 2>&1; then
+    service httpd stop
+fi
